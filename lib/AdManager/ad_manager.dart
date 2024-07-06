@@ -21,50 +21,47 @@ class AdManager {
   // COMPLETE: Add _interstitialAd
   InterstitialAd? _interstitialAd;
 
+  late String screenName;
+  late PassDataBetweenScreens? object;
+
   void loadAdsInAdManager() {
     debugPrint("AdManager is Started Loading Ads...");
-
     loadBannerAd();
-
     loadInterstitialAd();
   }
 
-  void showInterstitialAd(s, [PassDataBetweenScreens? object]) {
+  void showInterstitialAd(s, [PassDataBetweenScreens? object]) 
+  {
     debugPrint("Show Interstitial Ads");
+    screenName = s;
+    this.object = object;
     if (_interstitialAd != null) {
       _interstitialAd?.show();
     } else {
-      return;
+      adListener?.moveToScreenAfterAd(screenName, object);
     }
-
-    //adListener?.iAmListening();
   }
 
   // COMPLETE: Implement _loadInterstitialAd()
-  void loadInterstitialAd() {
+  void loadInterstitialAd() 
+  {
     InterstitialAd.load(
       adUnitId: AdHelper.interstitialAdUnitId,
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
-          //ad.show();
           _interstitialAd = ad;
-
           ad.fullScreenContentCallback = FullScreenContentCallback(
             onAdDismissedFullScreenContent: (ad) {
+              adListener?.moveToScreenAfterAd(screenName, object);
               loadInterstitialAd();
-              //_moveToHome();
-              //Navigator.of(context).pushNamed(s, arguments: object);
             },
           );
-
-          /*setState(() {
-            _interstitialAd = ad;
-          });*/
         },
         onAdFailedToLoad: (err) {
           debugPrint('Failed to load an interstitial ad: ${err.message}');
-          //Navigator.of(context).pushNamed('/AboutUs');
+          adListener?.moveToScreenAfterAd(screenName, object);
+          loadInterstitialAd();
         },
       ),
     );
@@ -93,10 +90,7 @@ class AdManager {
 
 abstract class AdListener {
   //void onClueUpdated(String clue);
-
   //void onGameOver(int correctAnswers);
-
   //void onLevelCleared();
-
-  //void onNewLevel(int level, Drawing drawing, String clue);
+  void moveToScreenAfterAd(String s, [PassDataBetweenScreens? object]);
 }

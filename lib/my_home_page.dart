@@ -10,7 +10,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> implements ProjectListener {
+class _MyHomePageState extends State<MyHomePage> implements ProjectListener, AdListener {
   @override
   void initState() {
     super.initState();
@@ -18,7 +18,9 @@ class _MyHomePageState extends State<MyHomePage> implements ProjectListener {
       ..listener = this
       ..startApp();
 
-    AdManager.instance.loadAdsInAdManager();
+    AdManager.instance
+    ..adListener = this
+    ..loadAdsInAdManager();
   }
 
   @override
@@ -62,11 +64,13 @@ class _MyHomePageState extends State<MyHomePage> implements ProjectListener {
   @override
   void dispose() {
     ProjectManager.instance.listener = null;
+    AdManager.instance.adListener = null;
     super.dispose();
   }
 
   @override
   void moveToScreen(String s,[PassDataBetweenScreens? object]) {
+    // TODO: implement moveToScreen
     debugPrint("Move to Screen $s");
     Navigator.of(context).pushNamed(s,arguments: object);
   }
@@ -76,5 +80,12 @@ class _MyHomePageState extends State<MyHomePage> implements ProjectListener {
     // TODO: implement showAd
     debugPrint("Showing Ad Now");
     AdManager.instance.showInterstitialAd(s,object);
+  }
+  
+  @override
+  void moveToScreenAfterAd(String s, [PassDataBetweenScreens? object]) {
+    // TODO: implement moveToScreenAfterAd
+    debugPrint("Move to Screen After Ad $s");
+    Navigator.of(context).pushNamed(s,arguments: object);
   }
 }

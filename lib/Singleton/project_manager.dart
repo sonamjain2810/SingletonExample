@@ -34,15 +34,8 @@ class ProjectManager {
   }
 }
 
-abstract class ProjectListener {
-  //void onClueUpdated(String clue);
-
-  //void onGameOver(int correctAnswers);
-
-  //void onLevelCleared();
-
-  //void onNewLevel(int level, Drawing drawing, String clue);
-
+abstract class ProjectListener 
+{
   void moveToScreen(String s, [PassDataBetweenScreens? object]);
   
   void showAd(String s, [PassDataBetweenScreens? object]);
