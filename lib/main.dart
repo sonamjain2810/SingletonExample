@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:singleton/AboutUs.dart';
+import 'package:singleton/MessagesList.dart';
+import 'package:singleton/QuotesList.dart';
 import 'package:singleton/my_home_page.dart';
 
-void main() {
+void main() 
+{
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   runApp(const MyApp());
 }
 
@@ -15,8 +21,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       routes: <String, WidgetBuilder>{
-        
-        '/AboutUs': (BuildContext context) => AboutUs()
+        '/AboutUs': (BuildContext context) => AboutUs(),
+        '/MessagesList': (BuildContext context) => MessagesList(),
+        '/QuotesList': (BuildContext context) => QuotesList(),
       },
       theme: ThemeData(
         // This is the theme of your application.
@@ -41,4 +48,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
