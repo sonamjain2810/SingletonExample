@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:singleton/AdManager/ad_manager.dart';
+import 'package:singleton/Enums/project_routes_enum.dart';
 import 'Singleton/project_manager.dart';
 import 'utils/pass_data_between_screens.dart';
 
@@ -36,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> implements ProjectListener, AdL
           children: <Widget>[
             ElevatedButton(
                 onPressed: () {
-                  ProjectManager.instance.clickOnButton('/MessagesList',PassDataBetweenScreens("6", "2"));
+                  ProjectManager.instance.clickOnButton(ProjectRoutes.messagesList.toString(),PassDataBetweenScreens("6", "2"));
                 },
                 child: const Text("Messages Click")),
             const SizedBox(
@@ -44,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> implements ProjectListener, AdL
             ),
             ElevatedButton(
                 onPressed: () {
-                  ProjectManager.instance.clickOnButton('/QuotesList');
+                  ProjectManager.instance.clickOnButton(ProjectRoutes.quotesList.toString());
                 },
                 child: const Text("Quotes Click")),
             const SizedBox(
@@ -52,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> implements ProjectListener, AdL
             ),
             ElevatedButton(
                 onPressed: () {
-                  ProjectManager.instance.clickOnButton('/AboutUs');
+                  ProjectManager.instance.clickOnButton(ProjectRoutes.aboutUs.toString());
                 },
                 child: const Text("About Us")),
           ],

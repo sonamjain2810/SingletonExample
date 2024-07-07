@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:singleton/AboutUs.dart';
+import 'package:singleton/Enums/project_routes_enum.dart';
 import 'package:singleton/MessagesList.dart';
 import 'package:singleton/QuotesList.dart';
 import 'package:singleton/my_home_page.dart';
@@ -21,9 +22,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       routes: <String, WidgetBuilder>{
-        '/AboutUs': (BuildContext context) => AboutUs(),
-        '/MessagesList': (BuildContext context) => MessagesList(),
-        '/QuotesList': (BuildContext context) => QuotesList(),
+        '${ProjectRoutes.aboutUs}': (BuildContext context) => AboutUs(),
+        '${ProjectRoutes.messagesList}': (BuildContext context) => const MessagesList(),
+        '${ProjectRoutes.quotesList}': (BuildContext context) => QuotesList(),
       },
       theme: ThemeData(
         // This is the theme of your application.
