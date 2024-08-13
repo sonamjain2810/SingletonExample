@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -7,21 +7,20 @@ import 'AdManager/ad_helper.dart';
 import 'AdManager/ad_manager.dart';
 import 'Enums/project_routes_enum.dart';
 import 'Singleton/project_manager.dart';
-import 'data/Quotes.dart';
-import 'data/Strings.dart';
+import 'data/Gifs.dart';
 import 'utils/SizeConfig.dart';
 
-class QuotesList extends StatefulWidget {
+class GifsImages extends StatefulWidget {
   @override
-  _QuotesListState createState() => _QuotesListState();
+  _GifsImagesState createState() => _GifsImagesState();
 }
 
-class _QuotesListState extends State<QuotesList>
+class _GifsImagesState extends State<GifsImages>
     {
   static final facebookAppEvents = FacebookAppEvents();
-  var data = Quotes.quotesData;
-
   BannerAd? _bannerAd;
+
+  var data = Gifs.gifsPath;
 
   @override
   void initState() {
@@ -51,7 +50,7 @@ class _QuotesListState extends State<QuotesList>
   @override
   void dispose() {
     super.dispose();
-    _bannerAd?.dispose();
+    _bannerAd!.dispose();
   }
 
   @override
@@ -59,54 +58,50 @@ class _QuotesListState extends State<QuotesList>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Quotes List",
+          "Gif Images",
           style: Theme.of(context).appBarTheme.toolbarTextStyle,
         ),
       ),
       body: SafeArea(
-        // ignore: unnecessary_null_comparison
         child: data != null
-            ? ListView.builder(
+            ? GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2),
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                    onTap: () {
-                      ProjectManager.instance.clickOnButton(
-                          ProjectRoutes.quotesDetailPage.toString(),
-                          PassDataBetweenScreens("6", index.toString()));
-                    },
                     child: Padding(
+                      //8.0
                       padding:
                           EdgeInsets.all(1.93 * SizeConfig.widthMultiplier),
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primaryContainer,
-                                ),
-                                borderRadius:
-                                    // 40 /8.98 = 4.46
-                                    BorderRadius.all(Radius.circular(
-                                        4.46 * SizeConfig.widthMultiplier))),
-                            child: ListTile(
-                              leading: Icon(Icons.brightness_1,
-                                  color:
-                                      Theme.of(context).primaryIconTheme.color),
-                              title: Text(
-                                data[index],
-                                maxLines: 2,
-                                style: Theme.of(context).textTheme.labelLarge,
-                              ),
-                              trailing: Icon(Icons.arrow_forward_ios,
-                                  color:
-                                      Theme.of(context).primaryIconTheme.color),
-                            ),
+
+                      child: ListTile(
+                        title: CachedNetworkImage(
+                          imageUrl: data[index],
+                          placeholder: (context, url) =>
+                              const CircularProgressIndicator(
+                            color: Colors.white,
                           ),
-                        ],
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                          fadeOutDuration: const Duration(seconds: 1),
+                          fadeInDuration: const Duration(seconds: 3),
+                        ),
                       ),
                     ),
+                    onTap: () {
+                      debugPrint("Click on Gif Grid item $index");
+                      Navigator.of(context).pushNamed(
+                          ProjectRoutes.gifDetailPage.toString(),
+                          arguments:
+                              PassDataBetweenScreens("", index.toString()));
+
+                      facebookAppEvents.logEvent(
+                        name: "GIF List",
+                        parameters: {
+                          'clicked_on_gif_image_index': '$index',
+                        },
+                      );
+                    },
                   );
                 },
                 itemCount: data.length,

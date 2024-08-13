@@ -15,9 +15,6 @@ class AdManager {
 
   int adCounter = 0;
 
-  // COMPLETE: Add _bannerAd
-  BannerAd? _bannerAd;
-
   // COMPLETE: Add _interstitialAd
   InterstitialAd? _interstitialAd;
 
@@ -26,12 +23,10 @@ class AdManager {
 
   void loadAdsInAdManager() {
     debugPrint("AdManager is Started Loading Ads...");
-    loadBannerAd();
     loadInterstitialAd();
   }
 
-  void showInterstitialAd(s, [PassDataBetweenScreens? object]) 
-  {
+  void showInterstitialAd(s, [PassDataBetweenScreens? object]) {
     debugPrint("Show Interstitial Ads");
     screenName = s;
     this.object = object;
@@ -39,12 +34,12 @@ class AdManager {
       _interstitialAd?.show();
     } else {
       adListener?.moveToScreenAfterAd(screenName, object);
+      loadInterstitialAd();
     }
   }
 
   // COMPLETE: Implement _loadInterstitialAd()
-  void loadInterstitialAd() 
-  {
+  void loadInterstitialAd() {
     InterstitialAd.load(
       adUnitId: AdHelper.interstitialAdUnitId,
       request: const AdRequest(),
@@ -67,30 +62,17 @@ class AdManager {
     );
   }
 
-  void loadBannerAd() {
+  void loadBannerAd(BannerAdListener bannerAdListener) {
 // COMPLETE: Load a banner ad
     BannerAd(
       adUnitId: AdHelper.bannerAdUnitId,
       request: const AdRequest(),
       size: AdSize.banner,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          /*setState(() {
-            _bannerAd = ad as BannerAd;
-          });*/
-        },
-        onAdFailedToLoad: (ad, err) {
-          debugPrint('Failed to load a banner ad: ${err.message}');
-          ad.dispose();
-        },
-      ),
+      listener: bannerAdListener,
     ).load();
   }
 }
 
 abstract class AdListener {
-  //void onClueUpdated(String clue);
-  //void onGameOver(int correctAnswers);
-  //void onLevelCleared();
   void moveToScreenAfterAd(String s, [PassDataBetweenScreens? object]);
 }

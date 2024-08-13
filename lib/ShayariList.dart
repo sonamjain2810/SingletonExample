@@ -1,26 +1,25 @@
 import 'dart:io';
+
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:singleton/utils/pass_data_between_screens.dart';
 import 'AdManager/ad_helper.dart';
-import 'AdManager/ad_manager.dart';
 import 'Enums/project_routes_enum.dart';
 import 'Singleton/project_manager.dart';
-import 'data/Quotes.dart';
-import 'data/Strings.dart';
+import 'data/Shayari.dart';
 import 'utils/SizeConfig.dart';
+import 'utils/pass_data_between_screens.dart';
+//import 'ShayariDetailPage.dart';
 
-class QuotesList extends StatefulWidget {
+class ShayariList extends StatefulWidget {
   @override
-  _QuotesListState createState() => _QuotesListState();
+  _ShayariListState createState() => _ShayariListState();
 }
 
-class _QuotesListState extends State<QuotesList>
-    {
+class _ShayariListState extends State<ShayariList> {
   static final facebookAppEvents = FacebookAppEvents();
-  var data = Quotes.quotesData;
-
+  var data = Shayari.shayariData;
+  
   BannerAd? _bannerAd;
 
   @override
@@ -31,22 +30,24 @@ class _QuotesListState extends State<QuotesList>
 
   BannerAd loadBannerAd() {
     return BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      request: const AdRequest(),
-      size: AdSize.banner,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            _bannerAd = ad as BannerAd;
-          });
-        },
-        onAdFailedToLoad: (ad, err) {
-          debugPrint('Failed to load a banner ad: ${err.message}');
-          ad.dispose();
-        },
-      ),
-    );
+    adUnitId: AdHelper.bannerAdUnitId,
+    request: const AdRequest(),
+    size: AdSize.banner,
+    listener: BannerAdListener(
+      onAdLoaded: (ad) {
+        setState(() {
+          _bannerAd = ad as BannerAd;
+        });
+      },
+      onAdFailedToLoad: (ad, err) {
+        debugPrint('Failed to load a banner ad: ${err.message}');
+        ad.dispose();
+      },
+    ),
+  );
   }
+
+  
 
   @override
   void dispose() {
@@ -59,21 +60,15 @@ class _QuotesListState extends State<QuotesList>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Quotes List",
+          "Shayari List",
           style: Theme.of(context).appBarTheme.toolbarTextStyle,
         ),
       ),
       body: SafeArea(
-        // ignore: unnecessary_null_comparison
         child: data != null
             ? ListView.builder(
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                    onTap: () {
-                      ProjectManager.instance.clickOnButton(
-                          ProjectRoutes.quotesDetailPage.toString(),
-                          PassDataBetweenScreens("6", index.toString()));
-                    },
                     child: Padding(
                       padding:
                           EdgeInsets.all(1.93 * SizeConfig.widthMultiplier),
@@ -87,13 +82,14 @@ class _QuotesListState extends State<QuotesList>
                                       .primaryContainer,
                                 ),
                                 borderRadius:
-                                    // 40 /8.98 = 4.46
+                                    // 40 / 8.96 = 4.46
                                     BorderRadius.all(Radius.circular(
                                         4.46 * SizeConfig.widthMultiplier))),
                             child: ListTile(
-                              leading: Icon(Icons.brightness_1,
-                                  color:
-                                      Theme.of(context).primaryIconTheme.color),
+                              leading: Icon(
+                                Icons.brightness_1,
+                                color: Theme.of(context).primaryIconTheme.color,
+                              ),
                               title: Text(
                                 data[index],
                                 maxLines: 2,
@@ -107,6 +103,19 @@ class _QuotesListState extends State<QuotesList>
                         ],
                       ),
                     ),
+                    onTap: () {
+                      //Navigator.push(context,MaterialPageRoute(builder: (context) => ShayariDetailPage(index)));
+
+                      ProjectManager.instance.clickOnButton(
+                          ProjectRoutes.shayariDetailPage.toString(),
+                          PassDataBetweenScreens("", index.toString()));
+                      facebookAppEvents.logEvent(
+                        name: "Shayari List",
+                        parameters: {
+                          'clicked_on_shayari_index': '$index',
+                        },
+                      );
+                    },
                   );
                 },
                 itemCount: data.length,
@@ -116,17 +125,16 @@ class _QuotesListState extends State<QuotesList>
               ),
       ),
       bottomNavigationBar: BottomAppBar(
-        child: _bannerAd != null
-            ? SizedBox(
-                width: _bannerAd!.size.width.toDouble(),
-                height: _bannerAd!.size.height.toDouble(),
-                child: AdWidget(
-                  ad: _bannerAd!,
-                ),
-              )
-            : Container(),
-      ),
+            child: _bannerAd != null
+                ? SizedBox(
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
+                    child: AdWidget(
+                      ad: _bannerAd!,
+                    ),
+                  )
+                : Container(),
+          ),
     );
   }
-
 }

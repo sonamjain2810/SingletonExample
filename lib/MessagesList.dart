@@ -1,5 +1,9 @@
 import 'dart:io';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'AdManager/ad_helper.dart';
+import 'AdManager/ad_manager.dart';
+import 'Enums/project_routes_enum.dart';
+import 'Singleton/project_manager.dart';
 import 'data/Messages.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:flutter/material.dart';
@@ -9,59 +13,66 @@ import 'utils/pass_data_between_screens.dart';
 
 // ignore: must_be_immutable
 class MessagesList extends StatefulWidget {
-  
   const MessagesList({super.key});
   @override
   _MessagesListState createState() => _MessagesListState();
 }
 
-class _MessagesListState extends State<MessagesList> {
+class _MessagesListState extends State<MessagesList>
+     {
   late String type;
- 
 
   static final facebookAppEvents = FacebookAppEvents();
 
   var data;
 
-  late BannerAd bannerAd1;
-  bool isBannerAdLoaded = false;
+  BannerAd? _bannerAd;
+
   @override
-  void initState() {
+  void initState() 
+  {
     super.initState();
-    bannerAd1 = GetBannerAd();
+    loadBannerAd().load();
   }
 
-  BannerAd GetBannerAd() {
+  BannerAd loadBannerAd() {
     return BannerAd(
-        size: AdSize.largeBanner,
-        adUnitId: Platform.isAndroid
-            ? Strings.androidAdmobBannerId
-            : Strings.iosAdmobBannerId,
-        listener: BannerAdListener(onAdLoaded: (_) {
+      adUnitId: AdHelper.bannerAdUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
           setState(() {
-            isBannerAdLoaded = true;
+            _bannerAd = ad as BannerAd;
           });
-        }, onAdFailedToLoad: (ad, error) {
-          isBannerAdLoaded = true;
+        },
+        onAdFailedToLoad: (ad, err) {
+          debugPrint('Failed to load a banner ad: ${err.message}');
           ad.dispose();
-        }),
-        request: AdRequest())
-      ..load();
+        },
+      ),
+    );
   }
 
   @override
   void dispose() {
+    debugPrint("MessageList: Dispose Called");
+
+    //projectManager.listener = null;
+    //adManager.adListener = null;
+
+    _bannerAd?.dispose();
+
     super.dispose();
-    bannerAd1.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    final args = ModalRoute.of(context)!.settings.arguments as PassDataBetweenScreens;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as PassDataBetweenScreens;
     type = args.title;
 
-    debugPrint('Message type is $type');
+    debugPrint('Message List Build Method: Message type is $type');
 
     if (type == '1') {
       // English
@@ -100,7 +111,10 @@ class _MessagesListState extends State<MessagesList> {
             ? ListView.builder(
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      ProjectManager.instance.clickOnButton(ProjectRoutes.messagesDetailPage.toString(),PassDataBetweenScreens("6", index.toString()));
+                      //Navigator.of(context).pushNamed(ProjectRoutes.messagesDetailPage.toString(),arguments: PassDataBetweenScreens("6", index.toString()));
+                    },
                     child: Padding(
                       padding:
                           EdgeInsets.all(1.93 * SizeConfig.widthMultiplier),
@@ -142,12 +156,18 @@ class _MessagesListState extends State<MessagesList> {
                 child: CircularProgressIndicator(),
               ),
       ),
-      bottomNavigationBar: Container(
-        alignment: Alignment.center,
-        height: bannerAd1.size.height.toDouble(),
-        width: bannerAd1.size.width.toDouble(),
-        child: AdWidget(ad: bannerAd1),
+      bottomNavigationBar: BottomAppBar(
+        child: _bannerAd != null
+            ? SizedBox(
+                width: _bannerAd!.size.width.toDouble(),
+                height: _bannerAd!.size.height.toDouble(),
+                child: AdWidget(
+                  ad: _bannerAd!,
+                ),
+              )
+            : Container(),
       ),
     );
   }
+
 }

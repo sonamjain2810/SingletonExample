@@ -11,32 +11,27 @@ class ProjectManager {
 
   ProjectListener? listener;
 
-  int adCounter=0;
+  int adCounter = 0;
 
   void startApp() {
     debugPrint("1. App is Started");
   }
 
   void clickOnButton(String s, [PassDataBetweenScreens? object]) {
-    
     adCounter++;
 
     debugPrint("2. Click on Elevated Button with adCounter = $adCounter");
-    if(adCounter % 3 == 0)
-    {
-      listener?.showAd(s,object);
+
+    if (adCounter % 3 == 0) {
+      listener?.showAd(s, object);
+    } else {
+      listener?.moveToScreen(s, object);
     }
-    else
-    {
-      listener?.moveToScreen(s,object); 
-    }
-    
   }
 }
 
 abstract class ProjectListener 
 {
   void moveToScreen(String s, [PassDataBetweenScreens? object]);
-  
   void showAd(String s, [PassDataBetweenScreens? object]);
 }

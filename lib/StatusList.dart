@@ -1,25 +1,25 @@
 import 'dart:io';
+
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:singleton/utils/pass_data_between_screens.dart';
+//import 'StatusDetailPage.dart';
 import 'AdManager/ad_helper.dart';
-import 'AdManager/ad_manager.dart';
 import 'Enums/project_routes_enum.dart';
 import 'Singleton/project_manager.dart';
-import 'data/Quotes.dart';
+import 'data/Status.dart';
 import 'data/Strings.dart';
 import 'utils/SizeConfig.dart';
+import 'utils/pass_data_between_screens.dart';
 
-class QuotesList extends StatefulWidget {
+class StatusList extends StatefulWidget {
   @override
-  _QuotesListState createState() => _QuotesListState();
+  _StatusListState createState() => _StatusListState();
 }
 
-class _QuotesListState extends State<QuotesList>
-    {
+class _StatusListState extends State<StatusList> {
   static final facebookAppEvents = FacebookAppEvents();
-  var data = Quotes.quotesData;
+  var data = Status.statusData;
 
   BannerAd? _bannerAd;
 
@@ -59,20 +59,25 @@ class _QuotesListState extends State<QuotesList>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Quotes List",
+          "Status List",
           style: Theme.of(context).appBarTheme.toolbarTextStyle,
         ),
       ),
       body: SafeArea(
-        // ignore: unnecessary_null_comparison
-        child: data != null
-            ? ListView.builder(
+        child:ListView.builder(
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
+                      //Navigator.push(context,MaterialPageRoute(builder: (context) => StatusDetailPage(index)));
                       ProjectManager.instance.clickOnButton(
-                          ProjectRoutes.quotesDetailPage.toString(),
-                          PassDataBetweenScreens("6", index.toString()));
+                          ProjectRoutes.statusDetailPage.toString(),
+                          PassDataBetweenScreens("", index.toString()));
+                      facebookAppEvents.logEvent(
+                        name: "Status List",
+                        parameters: {
+                          'clicked_on_status_index': '$index',
+                        },
+                      );
                     },
                     child: Padding(
                       padding:
@@ -111,9 +116,7 @@ class _QuotesListState extends State<QuotesList>
                 },
                 itemCount: data.length,
               )
-            : const Center(
-                child: CircularProgressIndicator(),
-              ),
+            ,
       ),
       bottomNavigationBar: BottomAppBar(
         child: _bannerAd != null
@@ -128,5 +131,4 @@ class _QuotesListState extends State<QuotesList>
       ),
     );
   }
-
 }
